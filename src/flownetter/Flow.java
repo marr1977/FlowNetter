@@ -1,11 +1,11 @@
 package flownetter;
 
 public class Flow {
-	private Entity sink;
-	private Entity source;
+	private String sink;
+	private String source;
 	private long value;
 
-	public Flow(Entity source, Entity sink, long value) {
+	public Flow(String source, String sink, long value) {
 		this.sink = sink;
 		this.source = source;
 		this.value = value;
@@ -15,11 +15,11 @@ public class Flow {
 		this(flow.getSource(), flow.getSink(), flow.getValue());
 	}
 
-	public Entity getSink() {
+	public String getSink() {
 		return sink;
 	}
 
-	public Entity getSource() {
+	public String getSource() {
 		return source;
 	}
 

@@ -11,8 +11,8 @@ public class FlowCollection {
 
 	private List<Flow> flows = new ArrayList<>();
 	
-	private Map<Entity, Map<Entity, Collection<Flow>>> flowBySink = new HashMap<>();
-	private Map<Entity, Map<Entity, Collection<Flow>>> flowBySource = new HashMap<>();
+	private Map<String, Map<String, Collection<Flow>>> flowBySink = new HashMap<>();
+	private Map<String, Map<String, Collection<Flow>>> flowBySource = new HashMap<>();
 
 	private boolean changed;
 
@@ -20,32 +20,32 @@ public class FlowCollection {
 		return flows;
 	}
 	
-	public Collection<Entity> getSources() {
-		return new ArrayList<Entity>(flowBySource.keySet());
+	public Collection<String> getSources() {
+		return new ArrayList<String>(flowBySource.keySet());
 	}
 	
-	public Collection<Entity> getSinks(Entity source) {
-		Map<Entity, Collection<Flow>> map = flowBySource.get(source);
+	public Collection<String> getSinks(String source) {
+		Map<String, Collection<Flow>> map = flowBySource.get(source);
 		
 		if (map == null) {
-			return Collections.<Entity>emptyList();
+			return Collections.<String>emptyList();
 		}
 		
-		return new ArrayList<Entity>(map.keySet());
+		return new ArrayList<String>(map.keySet());
 	}
 	
-	public Collection<Entity> getSources(Entity sink) {
-		Map<Entity, Collection<Flow>> map = flowBySink.get(sink);
+	public Collection<String> getSources(String sink) {
+		Map<String, Collection<Flow>> map = flowBySink.get(sink);
 		
 		if (map == null) {
-			return Collections.<Entity>emptyList();
+			return Collections.<String>emptyList();
 		}
 		
-		return new ArrayList<Entity>(map.keySet());
+		return new ArrayList<String>(map.keySet());
 	}
 
-	public List<Flow> getFlows(Entity source, Entity sink) {
-		Map<Entity, Collection<Flow>> map = flowBySource.get(source);
+	public List<Flow> getFlows(String source, String sink) {
+		Map<String, Collection<Flow>> map = flowBySource.get(source);
 		
 		if (map != null) {
 			Collection<Flow> flows = map.get(sink);
@@ -77,12 +77,12 @@ public class FlowCollection {
 	}
 	
 	private void add(
-			Map<Entity, Map<Entity, Collection<Flow>>> collection,
-			Entity primaryKey, 
-			Entity secondaryKey,
+			Map<String, Map<String, Collection<Flow>>> collection,
+			String primaryKey, 
+			String secondaryKey,
 			Flow flow) {
 		
-		Map<Entity, Collection<Flow>> map = collection.get(primaryKey);
+		Map<String, Collection<Flow>> map = collection.get(primaryKey);
 		if (map == null) {
 			map = new HashMap<>();
 			collection.put(primaryKey, map);
@@ -99,12 +99,12 @@ public class FlowCollection {
 	}
 
 	private void remove(
-			Map<Entity, Map<Entity, Collection<Flow>>> collection,
-			Entity primaryKey, 
-			Entity secondaryKey,
+			Map<String, Map<String, Collection<Flow>>> collection,
+			String primaryKey, 
+			String secondaryKey,
 			Flow flow) {
 		
-		Map<Entity, Collection<Flow>> map = collection.get(primaryKey);
+		Map<String, Collection<Flow>> map = collection.get(primaryKey);
 		if (map == null) {
 			return;
 		}

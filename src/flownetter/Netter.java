@@ -34,7 +34,7 @@ public class Netter {
 		
 		removeCircularFlow();
 		
-		findNetZeroEntity();
+		findNetZeroString();
 		
 		aggregateSameSourceAndSink();
 		
@@ -44,27 +44,27 @@ public class Netter {
 	/**
 	 * For all entities with a net zero flow (outgoing == incoming),
 	 * finds suitable re-mapping of incoming to outgoing flows,
-	 * thus removing this entity from the graph completely.
+	 * thus removing this String from the graph completely.
 	 * 
-	 * Max one entity is removed each time this function is called.
+	 * Max one String is removed each time this function is called.
 	 * 
 	 */
-	private void findNetZeroEntity() {
+	private void findNetZeroString() {
 
 		FlowReplacements bestReplacement = null;
 		
-		for (Entity entity : flowCollection.getSources()) {
+		for (String String : flowCollection.getSources()) {
 
 			FlowList incoming = new FlowList();
 			FlowList outgoing = new FlowList();
 			
-			flowCollection.getSources(entity).stream().forEach(
-				sourceEntity -> incoming.addAll(
-					flowCollection.getFlows(sourceEntity, entity)));
+			flowCollection.getSources(String).stream().forEach(
+				sourceString -> incoming.addAll(
+					flowCollection.getFlows(sourceString, String)));
 			
-			flowCollection.getSinks(entity).stream().forEach(
-				sinkEntity -> outgoing.addAll(
-					flowCollection.getFlows(entity, sinkEntity)));
+			flowCollection.getSinks(String).stream().forEach(
+				sinkString -> outgoing.addAll(
+					flowCollection.getFlows(String, sinkString)));
 			
 			if (incoming.getTotalValue() !=	outgoing.getTotalValue()) {
 				continue;
@@ -225,7 +225,7 @@ public class Netter {
 		
 		List<List<Flow>> circularFlows = new ArrayList<>();
 		
-		for (Entity source : flowCollection.getSources()) {
+		for (String source : flowCollection.getSources()) {
 			circularFlows.addAll(getCircularFlow(source, source, new ArrayList<>()));
 		}
 		
@@ -283,7 +283,7 @@ public class Netter {
 		}
 	}
 
-	private List<List<Flow>> getCircularFlow(Entity entityToFind, Entity source, List<Entity> visited) {
+	private List<List<Flow>> getCircularFlow(String StringToFind, String source, List<String> visited) {
 		
 		// Must maintain a visited collection or risk running into infinite loops
 		if (visited.contains(source)) {
@@ -293,13 +293,13 @@ public class Netter {
 		
 		List<List<Flow>> circularFlows = new ArrayList<>();
 		
-		for (Entity sink : flowCollection.getSinks(source)) {
+		for (String sink : flowCollection.getSinks(source)) {
 			Flow sinkFlow = flowCollection.getFlows(source, sink).get(0);
 			
-			if (sink.equals(entityToFind)) {
+			if (sink.equals(StringToFind)) {
 				circularFlows.add(Arrays.asList(sinkFlow));
 			} else {
-				List<List<Flow>> circularChildFlows = getCircularFlow(entityToFind, sink, visited);
+				List<List<Flow>> circularChildFlows = getCircularFlow(StringToFind, sink, visited);
 				
 				for (List<Flow> circularChildFlow : circularChildFlows) {
 					List<Flow> flows = new ArrayList<>();
@@ -318,8 +318,8 @@ public class Netter {
 	 * Nets payments between parties
 	 */
 	private void netBetweenParties() {
-		for (Entity source : flowCollection.getSources()) {
-			for (Entity sink : flowCollection.getSinks(source)) {
+		for (String source : flowCollection.getSources()) {
+			for (String sink : flowCollection.getSinks(source)) {
 		
 				Collection<Flow> flows = flowCollection.getFlows(source, sink);
 				Collection<Flow> returnFlows = flowCollection.getFlows(sink, source);
@@ -355,8 +355,8 @@ public class Netter {
 	 */
 	private void aggregateSameSourceAndSink() {
 		
-		for (Entity source : flowCollection.getSources()) {
-			for (Entity sink : flowCollection.getSinks(source)) {
+		for (String source : flowCollection.getSources()) {
+			for (String sink : flowCollection.getSinks(source)) {
 				
 				Collection<Flow> flows = flowCollection.getFlows(source, sink);
 				
