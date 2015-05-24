@@ -5,7 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalLong;
 
@@ -19,14 +22,69 @@ public class Netter {
 	
 	
 	public List<Flow> net() {
+		Map<String, Long> netBefore = getNets();
 		
 		aggregateSameSourceAndSink();
 		
 		while (netRound());
 		
+		verifyEquals(netBefore, getNets());
+		 
 		return flowCollection.getFlows();
 	}
 	
+	/**
+	 * Returns a map containing the net value for each node
+	 */
+	private Map<String, Long> getNets() {
+		Map<String, Long> nets = new HashMap<>();
+		
+		for (Flow flow : flowCollection.getFlows()) {
+			nets.merge(flow.getSink(), flow.getValue(), (oldv, newv) -> oldv + newv);
+			nets.merge(flow.getSource(), -flow.getValue(), (oldv, newv) -> oldv + newv);
+		}
+		
+		return nets;
+	}
+
+
+	/**
+	 * Verifies that the two maps are equal with a missing value being equal to 0.
+	 */
+	private void verifyEquals(
+			Map<String, Long> netBefore,
+			Map<String, Long> netAfter) {
+
+		Iterator<String> beforeIterator = netBefore.keySet().iterator();
+		
+		while (beforeIterator.hasNext()) {
+			String entity = beforeIterator.next();
+			
+			long beforeValue = netBefore.get(entity);
+			long afterValue = netAfter.containsKey(entity) ? netAfter.get(entity) : 0;
+			
+			if (afterValue != beforeValue) {
+				throw new NettingException(entity, beforeValue, afterValue);
+			}
+			
+			beforeIterator.remove();
+			netAfter.remove(entity);
+		}
+		
+		Iterator<String> afterIterator = netAfter.keySet().iterator();
+		
+		while (afterIterator.hasNext()) {
+			String entity = beforeIterator.next();
+			
+			long afterValue = netAfter.get(entity);
+
+			if (afterValue != 0) {
+				throw new NettingException(entity, 0, afterValue);
+			}
+		}
+	}
+
+
 	private boolean netRound() {
 		flowCollection.setChanged(false);
 
